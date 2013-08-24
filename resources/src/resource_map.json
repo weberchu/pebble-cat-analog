@@ -1,8 +1,8 @@
 {
     "media": [
         {
-            "defName": "GUT_GUT",
-            "type": "png",
+            "defName": "IMAGE_GUT_GUT",
+            "type": "png-trans",
             "file": "images/gutgut_jump.png"
         }
     ],

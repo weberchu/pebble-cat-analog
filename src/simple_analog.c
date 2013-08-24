@@ -94,10 +94,8 @@ static void date_update_proc(Layer* me, GContext* ctx) {
 static void handle_init(AppContextRef app_ctx) {
   window_init(&s_data.window, "Simple Analog Watch");
 	
-  bmp_init_container(IMAGE_RESOURCE_GUT_GUT, &gut_gut_image);
-  gut_gut_image.layer.layer.frame.origin.x = 52;
-  gut_gut_image.layer.layer.frame.origin.y = 74;
-  layer_add_child(&s_data.window.layer, &gut_gut_image.layer.layer);
+  resource_init_current_app(&APP_RESOURCES);
+  bmp_init_container(RESOURCE_ID_IMAGE_GUT_GUT, &gut_gut_image);
 
 
 
@@ -152,6 +150,11 @@ static void handle_init(AppContextRef app_ctx) {
   layer_init(&s_data.hands_layer, s_data.simple_bg_layer.frame);
   s_data.hands_layer.update_proc = &hands_update_proc;
   layer_add_child(&s_data.window.layer, &s_data.hands_layer);
+	
+	
+  gut_gut_image.layer.layer.frame.origin.x = 52;
+  gut_gut_image.layer.layer.frame.origin.y = 44;
+  layer_add_child(&s_data.window.layer, &gut_gut_image.layer.layer);
 
   // Push the window onto the stack
   const bool animated = true;
