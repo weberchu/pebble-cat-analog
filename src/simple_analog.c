@@ -35,8 +35,8 @@ static struct SimpleAnalogData {
 
 Layer gut_gut_layer;
 static const GPathInfo GUT_GUT_PATH_INFO = {
-  .num_points = 24,
-  .points = (GPoint []) {{10, -73}, {12, -73}, {13, -70}, {14, -70}, {17, -67}, {7, -65}, {14, -62}, {14, -61}, {20, -57}, {20, -56}, {8, -57}, {-7, -56}, {-17, -52}, {-17, -54}, {-12, -60}, {-12, -61}, {-21, -65}, {-21, -67}, {-10, -64}, {-3, -64}, {7, -66}, {9, -70}, {10, -70}}
+  .num_points = 23,
+  .points = (GPoint []) {{10, -73}, {12, -73}, {13, -70}, {14, -70}, {17, -67}, {17, -65}, {14, -62}, {14, -61}, {20, -57}, {20, -56}, {8, -57}, {-7, -56}, {-17, -52}, {-17, -54}, {-12, -60}, {-12, -61}, {-21, -65}, {-21, -67}, {-10, -64}, {-3, -64}, {7, -66}, {9, -70}, {10, -70}}
 };
 
 static void bg_update_proc(Layer* me, GContext* ctx) {
@@ -52,12 +52,9 @@ static void bg_update_proc(Layer* me, GContext* ctx) {
 
 static void hands_update_proc(Layer* me, GContext* ctx) {
   const GPoint center = grect_center_point(&me->bounds);
-  const int16_t secondHandLength = me->bounds.size.w / 2;
 
   PblTm t;
   get_time(&t);
-
-  int32_t second_angle = TRIG_MAX_ANGLE * t.tm_sec / 60;
 
   // minute/hour hand
   graphics_context_set_fill_color(ctx, GColorWhite);
