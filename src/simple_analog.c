@@ -25,20 +25,20 @@ static struct SimpleAnalogData {
   char num_buffer[4];
 
   GPath minute_arrow, hour_arrow;
-  GPath tick_paths[NUM_CLOCK_TICKS];
+  //GPath tick_paths[NUM_CLOCK_TICKS];
   Layer hands_layer;
   Window window;
 } s_data;
 
 static void bg_update_proc(Layer* me, GContext* ctx) {
 
-  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(ctx, me->bounds, 0, GCornerNone);
 
-  graphics_context_set_fill_color(ctx, GColorWhite);
+/*  graphics_context_set_fill_color(ctx, GColorWhite);
   for (int i = 0; i < NUM_CLOCK_TICKS; ++i) {
     gpath_draw_filled(ctx, &s_data.tick_paths[i]);
-  }
+  }*/
 }
 
 static void hands_update_proc(Layer* me, GContext* ctx) {
@@ -55,12 +55,12 @@ static void hands_update_proc(Layer* me, GContext* ctx) {
   secondHand.x = (int16_t)(sin_lookup(second_angle) * (int32_t)secondHandLength / TRIG_MAX_RATIO) + center.x;
 
   // second hand
-  graphics_context_set_stroke_color(ctx, GColorWhite);
+  graphics_context_set_stroke_color(ctx, GColorBlack);
   graphics_draw_line(ctx, secondHand, center);
 
   // minute/hour hand
-  graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_context_set_stroke_color(ctx, GColorBlack);
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_context_set_stroke_color(ctx, GColorWhite);
 
   gpath_rotate_to(&s_data.minute_arrow, TRIG_MAX_ANGLE * t.tm_min / 60);
   gpath_draw_filled(ctx, &s_data.minute_arrow);
@@ -71,7 +71,7 @@ static void hands_update_proc(Layer* me, GContext* ctx) {
   gpath_draw_outline(ctx, &s_data.hour_arrow);
 
   // dot in the middle
-  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(ctx, GRect(me->bounds.size.w / 2-1, me->bounds.size.h / 2-1, 3, 3), 0, GCornerNone);
 }
 
@@ -102,9 +102,9 @@ static void handle_init(AppContextRef app_ctx) {
   gpath_move_to(&s_data.hour_arrow, center);
 
   // init clock face paths
-  for (int i = 0; i < NUM_CLOCK_TICKS; ++i) {
+/*  for (int i = 0; i < NUM_CLOCK_TICKS; ++i) {
     gpath_init(&s_data.tick_paths[i], &ANALOG_BG_POINTS[i]);
-  }
+  }*/
 
   // init layers
   layer_init(&s_data.simple_bg_layer, s_data.window.layer.frame);
@@ -119,8 +119,8 @@ static void handle_init(AppContextRef app_ctx) {
   // init day
   text_layer_init(&s_data.day_label, GRect(46, 114, 27, 20));
   text_layer_set_text(&s_data.day_label, s_data.day_buffer);
-  text_layer_set_background_color(&s_data.day_label, GColorBlack);
-  text_layer_set_text_color(&s_data.day_label, GColorWhite);
+  text_layer_set_background_color(&s_data.day_label, GColorWhite);
+  text_layer_set_text_color(&s_data.day_label, GColorBlack);
   GFont norm18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
   text_layer_set_font(&s_data.day_label, norm18);
 
@@ -130,8 +130,8 @@ static void handle_init(AppContextRef app_ctx) {
   text_layer_init(&s_data.num_label, GRect(73, 114, 18, 20));
 
   text_layer_set_text(&s_data.num_label, s_data.num_buffer);
-  text_layer_set_background_color(&s_data.num_label, GColorBlack);
-  text_layer_set_text_color(&s_data.num_label, GColorWhite);
+  text_layer_set_background_color(&s_data.num_label, GColorWhite);
+  text_layer_set_text_color(&s_data.num_label, GColorBlack);
   GFont bold18 = fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD);
   text_layer_set_font(&s_data.num_label, bold18);
 
