@@ -82,8 +82,8 @@ static void hands_update_proc(Layer* me, GContext* ctx) {
   gpath_draw_outline(ctx, &s_data.hour_arrow);
   
 
-gpath_draw_filled(ctx, &gut_gut_path);
-gpath_draw_outline(ctx, &gut_gut_path);
+gpath_draw_filled(ctx, &s_data.gut_gut_path);
+gpath_draw_outline(ctx, &s_data.gut_gut_path);
 
   // dot in the middle
   graphics_context_set_fill_color(ctx, GColorWhite);
@@ -115,7 +115,7 @@ static void handle_init(AppContextRef app_ctx) {
   s_data.num_buffer[0] = '\0';
 
   // init hand paths
-  gpath_init(&s_data.gut_gut_path, &GUT_GUT_PATH_INFO.points);
+  gpath_init(&s_data.gut_gut_path, &GUT_GUT_PATH_INFO);
   gpath_init(&s_data.minute_arrow, &MINUTE_HAND_POINTS);
   gpath_init(&s_data.hour_arrow, &HOUR_HAND_POINTS);
 
