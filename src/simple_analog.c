@@ -4,10 +4,12 @@
 #include "pebble_app.h"
 #include "pebble_fonts.h"
 
+#include "resource_ids.auto.h"
+
 #include "string.h"
 #include "stdlib.h"
 
-#define MY_UUID {0xe0, 0xfc, 0x1c, 0x31, 0x46, 0x8c, 0x4f, 0x69, 0xba, 0xbd, 0xd2, 0xec, 0x7a, 0xb3, 0x18, 0x13}
+#define MY_UUID {0x24, 0xF8, 0xD9, 0xD9, 0xE8, 0x05, 0x44, 0x30, 0x85, 0xC8, 0x81, 0x15, 0x3C, 0xEB, 0x14, 0xB9}
 PBL_APP_INFO(MY_UUID,
              "GutGut Analog",
              "Weber Chu",
@@ -29,6 +31,8 @@ static struct SimpleAnalogData {
   Layer hands_layer;
   Window window;
 } s_data;
+
+BmpContainer gut_gut_image;
 
 static void bg_update_proc(Layer* me, GContext* ctx) {
 
@@ -89,6 +93,13 @@ static void date_update_proc(Layer* me, GContext* ctx) {
 
 static void handle_init(AppContextRef app_ctx) {
   window_init(&s_data.window, "Simple Analog Watch");
+	
+  bmp_init_container(IMAGE_RESOURCE_GUT_GUT, &gut_gut_image);
+  gut_gut_image.layer.layer.frame.origin.x = 52;
+  gut_gut_image.layer.layer.frame.origin.y = 74;
+  layer_add_child(&s_data.window.layer, &gut_gut_image.layer.layer);
+
+
 
   s_data.day_buffer[0] = '\0';
   s_data.num_buffer[0] = '\0';
@@ -151,9 +162,17 @@ static void handle_second_tick(AppContextRef ctx, PebbleTickEvent* t) {
   layer_mark_dirty(&s_data.window.layer);
 }
 
+static void handle_deinit(AppContextRef ctx) {
+  layer_remove_from_parent(&gut_gut_image.layer.layer);
+  bmp_deinit_container(&gut_gut_image);
+}
+
+
+
 void pbl_main(void* params) {
   PebbleAppHandlers handlers = {
     .init_handler = &handle_init,
+	.deinit_handler = &handle_deinit,
     .tick_info = {
       .tick_handler = &handle_second_tick,
       .tick_units = SECOND_UNIT

@@ -1,9 +1,9 @@
 {
     "media": [
         {
-            "defName": "DUMMY",
-            "type": "raw",
-            "file": "data/resource_map.json"
+            "defName": "GUT_GUT",
+            "type": "png",
+            "file": "images/gutgut_jump.png"
         }
     ],
     "friendlyVersion": "VERSION",
