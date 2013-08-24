@@ -30,9 +30,16 @@ static struct SimpleAnalogData {
   //GPath tick_paths[NUM_CLOCK_TICKS];
   Layer hands_layer;
   Window window;
+  GPath gut_gut_path;
 } s_data;
 
 BmpContainer gut_gut_image;
+
+Layer gut_gut_layer;
+static const GPathInfo GUT_GUT_PATH_INFO = {
+  .num_points = 22,
+  .points = (GPoint []) {{31, 0}, {32, 1}, {32, 3}, {35, 3}, {36, 5}, {36, 7}, {33, 10}, {33, 12}, {39, 14}, {39, 15}, {31, 14}, {12, 15}, {4, 19}, {4, 17}, {9, 12}, {0, 7}, {0, 6}, {10, 9}, {18, 9}, {27, 7}, {29, 3}, {31, 3}}
+};
 
 static void bg_update_proc(Layer* me, GContext* ctx) {
 
@@ -73,6 +80,10 @@ static void hands_update_proc(Layer* me, GContext* ctx) {
   gpath_rotate_to(&s_data.hour_arrow, (TRIG_MAX_ANGLE * (((t.tm_hour % 12) * 6) + (t.tm_min / 10))) / (12 * 6));
   gpath_draw_filled(ctx, &s_data.hour_arrow);
   gpath_draw_outline(ctx, &s_data.hour_arrow);
+  
+
+gpath_draw_filled(ctx, &gut_gut_path);
+gpath_draw_outline(ctx, &gut_gut_path);
 
   // dot in the middle
   graphics_context_set_fill_color(ctx, GColorWhite);
@@ -94,8 +105,9 @@ static void date_update_proc(Layer* me, GContext* ctx) {
 static void handle_init(AppContextRef app_ctx) {
   window_init(&s_data.window, "Simple Analog Watch");
 	
-  resource_init_current_app(&APP_RESOURCES);
-  bmp_init_container(RESOURCE_ID_IMAGE_GUT_GUT, &gut_gut_image);
+//  resource_init_current_app(&APP_RESOURCES);
+//  bmp_init_container(RESOURCE_ID_IMAGE_GUT_GUT, &gut_gut_image);
+
 
 
 
@@ -103,10 +115,12 @@ static void handle_init(AppContextRef app_ctx) {
   s_data.num_buffer[0] = '\0';
 
   // init hand paths
+  gpath_init(&s_data.gut_gut_path, &GUT_GUT_PATH_INFO.points);
   gpath_init(&s_data.minute_arrow, &MINUTE_HAND_POINTS);
   gpath_init(&s_data.hour_arrow, &HOUR_HAND_POINTS);
 
   const GPoint center = grect_center_point(&s_data.window.layer.bounds);
+  gpath_move_to(&s_data.gut_gut_path, GPoint(52, 44));
   gpath_move_to(&s_data.minute_arrow, center);
   gpath_move_to(&s_data.hour_arrow, center);
 
@@ -152,9 +166,9 @@ static void handle_init(AppContextRef app_ctx) {
   layer_add_child(&s_data.window.layer, &s_data.hands_layer);
 	
 	
-  gut_gut_image.layer.layer.frame.origin.x = 52;
-  gut_gut_image.layer.layer.frame.origin.y = 44;
-  layer_add_child(&s_data.window.layer, &gut_gut_image.layer.layer);
+  //gut_gut_image.layer.layer.frame.origin.x = 52;
+  //gut_gut_image.layer.layer.frame.origin.y = 44;
+  //layer_add_child(&s_data.window.layer, &gut_gut_image.layer.layer);
 
   // Push the window onto the stack
   const bool animated = true;
