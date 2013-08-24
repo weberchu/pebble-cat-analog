@@ -38,7 +38,7 @@ BmpContainer gut_gut_image;
 Layer gut_gut_layer;
 static const GPathInfo GUT_GUT_PATH_INFO = {
   .num_points = 24,
-  .points = (GPoint []) {{31, 0}, {32, 1}, {32, 3}, {35, 3}, {36, 5}, {36, 7}, {33, 10}, {33, 12}, {39, 14}, {39, 15}, {31, 14}, {22, 14}, {12, 15}, {4, 19}, {4, 17}, {9, 12}, {9, 10}, {0, 7}, {0, 6}, {9, 9}, {18, 9}, {27, 7}, {29, 3}, {31, 3}}
+  .points = (GPoint []) {{11, -72}, {12, -71}, {12, -69}, {15, -69}, {16, -67}, {16, -65}, {13, -62}, {13, -60}, {19, -58}, {19, -57}, {11, -58}, {2, -58}, {-8, -57}, {-16, -53}, {-16, -55}, {-11, -60}, {-11, -62}, {-20, -65}, {-20, -66}, {-11, -63}, {-2, -63}, {7, -65}, {9, -69}, {11, -69}, }
 };
 
 static void bg_update_proc(Layer* me, GContext* ctx) {
@@ -56,22 +56,22 @@ static void hands_update_proc(Layer* me, GContext* ctx) {
   const GPoint center = grect_center_point(&me->bounds);
   const int16_t secondHandLength = me->bounds.size.w / 2;
 
-  GPoint secondHand;
+  //GPoint secondHand;
 
   PblTm t;
   get_time(&t);
 
   int32_t second_angle = TRIG_MAX_ANGLE * t.tm_sec / 60;
-  secondHand.y = (int16_t)(-cos_lookup(second_angle) * (int32_t)secondHandLength / TRIG_MAX_RATIO) + center.y;
-  secondHand.x = (int16_t)(sin_lookup(second_angle) * (int32_t)secondHandLength / TRIG_MAX_RATIO) + center.x;
+  //secondHand.y = (int16_t)(-cos_lookup(second_angle) * (int32_t)secondHandLength / TRIG_MAX_RATIO) + center.y;
+  //secondHand.x = (int16_t)(sin_lookup(second_angle) * (int32_t)secondHandLength / TRIG_MAX_RATIO) + center.x;
 
   // second hand
-  graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_draw_line(ctx, secondHand, center);
+  //graphics_context_set_stroke_color(ctx, GColorBlack);
+  //graphics_draw_line(ctx, secondHand, center);
 
   // minute/hour hand
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_context_set_stroke_color(ctx, GColorWhite);
+  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_context_set_stroke_color(ctx, GColorBlack);
 
   gpath_rotate_to(&s_data.minute_arrow, TRIG_MAX_ANGLE * t.tm_min / 60);
   gpath_draw_filled(ctx, &s_data.minute_arrow);
@@ -81,9 +81,9 @@ static void hands_update_proc(Layer* me, GContext* ctx) {
   gpath_draw_filled(ctx, &s_data.hour_arrow);
   gpath_draw_outline(ctx, &s_data.hour_arrow);
   
-
-gpath_draw_filled(ctx, &s_data.gut_gut_path);
-gpath_draw_outline(ctx, &s_data.gut_gut_path);
+  gpath_rotate_to(&s_data.minute_arrow, TRIG_MAX_ANGLE * t.tm_sec / 60);
+  gpath_draw_filled(ctx, &s_data.gut_gut_path);
+  gpath_draw_outline(ctx, &s_data.gut_gut_path);
 
   // dot in the middle
   graphics_context_set_fill_color(ctx, GColorWhite);
@@ -120,7 +120,7 @@ static void handle_init(AppContextRef app_ctx) {
   gpath_init(&s_data.hour_arrow, &HOUR_HAND_POINTS);
 
   const GPoint center = grect_center_point(&s_data.window.layer.bounds);
-  gpath_move_to(&s_data.gut_gut_path, GPoint(52, 44));
+  gpath_move_to(&s_data.gut_gut_path, center);
   gpath_move_to(&s_data.minute_arrow, center);
   gpath_move_to(&s_data.hour_arrow, center);
 
