@@ -13,7 +13,7 @@
 PBL_APP_INFO(MY_UUID,
              "GutGut Analog",
              "Weber Chu",
-             1, 0, /* App version */
+             1, 0,
              DEFAULT_MENU_ICON,
              APP_INFO_WATCH_FACE);
 
@@ -36,7 +36,7 @@ static struct SimpleAnalogData {
 Layer gut_gut_layer;
 static const GPathInfo GUT_GUT_PATH_INFO = {
   .num_points = 24,
-  .points = (GPoint []) {{11, -72}, {12, -71}, {12, -69}, {15, -69}, {16, -67}, {16, -65}, {13, -62}, {13, -60}, {19, -58}, {19, -57}, {11, -58}, {2, -58}, {-8, -57}, {-16, -53}, {-16, -55}, {-11, -60}, {-11, -62}, {-20, -65}, {-20, -66}, {-11, -63}, {-2, -63}, {7, -65}, {9, -69}, {11, -69}, }
+  .points = (GPoint []) {{10, -73}, {12, -73}, {13, -70}, {14, -70}, {17, -67}, {7, -65}, {14, -62}, {14, -61}, {20, -57}, {20, -56}, {8, -57}, {-7, -56}, {-17, -52}, {-17, -54}, {-12, -60}, {-12, -61}, {-21, -65}, {-21, -67}, {-10, -64}, {-3, -64}, {7, -66}, {9, -70}, {10, -70}}
 };
 
 static void bg_update_proc(Layer* me, GContext* ctx) {
@@ -54,18 +54,10 @@ static void hands_update_proc(Layer* me, GContext* ctx) {
   const GPoint center = grect_center_point(&me->bounds);
   const int16_t secondHandLength = me->bounds.size.w / 2;
 
-  //GPoint secondHand;
-
   PblTm t;
   get_time(&t);
 
   int32_t second_angle = TRIG_MAX_ANGLE * t.tm_sec / 60;
-  //secondHand.y = (int16_t)(-cos_lookup(second_angle) * (int32_t)secondHandLength / TRIG_MAX_RATIO) + center.y;
-  //secondHand.x = (int16_t)(sin_lookup(second_angle) * (int32_t)secondHandLength / TRIG_MAX_RATIO) + center.x;
-
-  // second hand
-  //graphics_context_set_stroke_color(ctx, GColorBlack);
-  //graphics_draw_line(ctx, secondHand, center);
 
   // minute/hour hand
   graphics_context_set_fill_color(ctx, GColorWhite);
@@ -80,6 +72,7 @@ static void hands_update_proc(Layer* me, GContext* ctx) {
   gpath_draw_outline(ctx, &s_data.hour_arrow);
   
   gpath_rotate_to(&s_data.gut_gut_path, TRIG_MAX_ANGLE * t.tm_sec / 60);
+  graphics_context_set_stroke_color(ctx, GColorClear);
   graphics_context_set_fill_color(ctx, GColorBlack);
   gpath_draw_filled(ctx, &s_data.gut_gut_path);
   gpath_draw_outline(ctx, &s_data.gut_gut_path);
