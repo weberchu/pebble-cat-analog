@@ -33,8 +33,6 @@ static struct SimpleAnalogData {
   GPath gut_gut_path;
 } s_data;
 
-BmpContainer gut_gut_image;
-
 Layer gut_gut_layer;
 static const GPathInfo GUT_GUT_PATH_INFO = {
   .num_points = 24,
@@ -81,7 +79,8 @@ static void hands_update_proc(Layer* me, GContext* ctx) {
   gpath_draw_filled(ctx, &s_data.hour_arrow);
   gpath_draw_outline(ctx, &s_data.hour_arrow);
   
-  gpath_rotate_to(&s_data.minute_arrow, TRIG_MAX_ANGLE * t.tm_sec / 60);
+  gpath_rotate_to(&s_data.gut_gut_path, TRIG_MAX_ANGLE * t.tm_sec / 60);
+  graphics_context_set_fill_color(ctx, GColorBlack);
   gpath_draw_filled(ctx, &s_data.gut_gut_path);
   gpath_draw_outline(ctx, &s_data.gut_gut_path);
 
@@ -104,12 +103,6 @@ static void date_update_proc(Layer* me, GContext* ctx) {
 
 static void handle_init(AppContextRef app_ctx) {
   window_init(&s_data.window, "Simple Analog Watch");
-	
-//  resource_init_current_app(&APP_RESOURCES);
-//  bmp_init_container(RESOURCE_ID_IMAGE_GUT_GUT, &gut_gut_image);
-
-
-
 
   s_data.day_buffer[0] = '\0';
   s_data.num_buffer[0] = '\0';
@@ -165,11 +158,6 @@ static void handle_init(AppContextRef app_ctx) {
   s_data.hands_layer.update_proc = &hands_update_proc;
   layer_add_child(&s_data.window.layer, &s_data.hands_layer);
 	
-	
-  //gut_gut_image.layer.layer.frame.origin.x = 52;
-  //gut_gut_image.layer.layer.frame.origin.y = 44;
-  //layer_add_child(&s_data.window.layer, &gut_gut_image.layer.layer);
-
   // Push the window onto the stack
   const bool animated = true;
   window_stack_push(&s_data.window, animated);
@@ -179,17 +167,9 @@ static void handle_second_tick(AppContextRef ctx, PebbleTickEvent* t) {
   layer_mark_dirty(&s_data.window.layer);
 }
 
-static void handle_deinit(AppContextRef ctx) {
-  layer_remove_from_parent(&gut_gut_image.layer.layer);
-  bmp_deinit_container(&gut_gut_image);
-}
-
-
-
 void pbl_main(void* params) {
   PebbleAppHandlers handlers = {
     .init_handler = &handle_init,
-	.deinit_handler = &handle_deinit,
     .tick_info = {
       .tick_handler = &handle_second_tick,
       .tick_units = SECOND_UNIT
