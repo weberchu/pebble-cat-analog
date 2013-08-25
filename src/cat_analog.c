@@ -46,12 +46,9 @@ static void bg_update_proc(Layer* me, GContext* ctx) {
 
 static void hands_update_proc(Layer* me, GContext* ctx) {
   const GPoint center = grect_center_point(&me->bounds);
-  const int16_t secondHandLength = me->bounds.size.w / 2;
 
   PblTm t;
   get_time(&t);
-
-  int32_t second_angle = TRIG_MAX_ANGLE * t.tm_sec / 60;
 
   // minute/hour hand
   graphics_context_set_fill_color(ctx, GColorWhite);

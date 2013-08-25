@@ -87,14 +87,14 @@ static const struct GPathInfo ANALOG_BG_POINTS[] = {
 };
 
 static const GPathInfo CAT_PATH_INFO = {
-  24,
+  23,
   (GPoint []) {
     {10, -73}, 
     {12, -73},
     {13, -70},
     {14, -70},
     {17, -67}
-    {7, -65}
+    {17, -65}
     {14, -62}
     {14, -61}
     {20, -57}
