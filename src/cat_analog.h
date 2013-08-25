@@ -115,6 +115,54 @@ static const GPathInfo CAT_PATH_INFO = {
   }
 };
 
+static const GPathInfo RIBBON_LEFT_PATH_INFO =
+{
+  17,
+  (GPoint []) {
+    {2, 7},
+    {-1, 1},
+    {-7, 0},
+    {-11, -3},
+    {-11, -6},
+    {-8, -9},
+    {-4, -9},
+    {-2, -7},
+    {0, -7},
+    {0, -3},
+    {-3, -4},
+    {-4, -5},
+    {-7, -5},
+    {-7, -4},
+    {-6, -3},
+    {2, -3},
+    {9, 5}
+  }
+};
+
+static const GPathInfo RIBBON_RIGHT_PATH_INFO =
+{
+  17,
+  (GPoint []) {
+    {-2, 7},
+    {1, 1},
+    {7, 0},
+    {11, -3},
+    {11, -6},
+    {8, -9},
+    {4, -9},
+    {2, -7},
+    {0, -7},
+    {0, -3},
+    {3, -4},
+    {4, -5},
+    {7, -5},
+    {7, -4},
+    {6, -3},
+    {-2, -3},
+    {-9, 5}
+  }
+};
+
 static const GPathInfo MINUTE_HAND_POINTS =
 {
   4,

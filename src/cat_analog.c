@@ -26,11 +26,10 @@ static struct SimpleAnalogData {
   TextLayer num_label;
   char num_buffer[4];
 
-  GPath minute_arrow, hour_arrow;
+  GPath minute_arrow, hour_arrow, cat_path, ribbon_left_path, ribbon_right_path;
   //GPath tick_paths[NUM_CLOCK_TICKS];
   Layer hands_layer;
   Window window;
-  GPath cat_path;
 } s_data;
 
 static void bg_update_proc(Layer* me, GContext* ctx) {
@@ -93,11 +92,15 @@ static void handle_init(AppContextRef app_ctx) {
 
   // init hand paths
   gpath_init(&s_data.cat_path, &CAT_PATH_INFO);
+  gpath_init(&s_data.ribbon_left_path, &CAT_PATH_INFO);
+  gpath_init(&s_data.ribbon_right_path, &CAT_PATH_INFO);
   gpath_init(&s_data.minute_arrow, &MINUTE_HAND_POINTS);
   gpath_init(&s_data.hour_arrow, &HOUR_HAND_POINTS);
 
   const GPoint center = grect_center_point(&s_data.window.layer.bounds);
   gpath_move_to(&s_data.cat_path, center);
+  gpath_move_to(&s_data.ribbon_left_path, center);
+  gpath_move_to(&s_data.ribbon_right_path, center);
   gpath_move_to(&s_data.minute_arrow, center);
   gpath_move_to(&s_data.hour_arrow, center);
 
@@ -136,6 +139,14 @@ static void handle_init(AppContextRef app_ctx) {
   text_layer_set_font(&s_data.num_label, bold18);
 
   layer_add_child(&s_data.date_layer, &s_data.num_label.layer);
+  
+  // ribbon
+  graphics_context_set_stroke_color(ctx, GColorClear);
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  gpath_draw_filled(ctx, &s_data.ribbon_left_path);
+  gpath_draw_filled(ctx, &s_data.ribbon_right_path);
+  gpath_draw_outline(ctx, &s_data.ribbon_left_path);
+  gpath_draw_outline(ctx, &s_data.ribbon_right_path);
 
   // init hands
   layer_init(&s_data.hands_layer, s_data.simple_bg_layer.frame);
