@@ -36,6 +36,14 @@ static void bg_update_proc(Layer* me, GContext* ctx) {
 
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(ctx, me->bounds, 0, GCornerNone);
+  
+  // ribbon
+  graphics_context_set_stroke_color(ctx, GColorClear);
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  gpath_draw_filled(ctx, &s_data.ribbon_left_path);
+  gpath_draw_filled(ctx, &s_data.ribbon_right_path);
+  gpath_draw_outline(ctx, &s_data.ribbon_left_path);
+  gpath_draw_outline(ctx, &s_data.ribbon_right_path);
 
 /*  graphics_context_set_fill_color(ctx, GColorWhite);
   for (int i = 0; i < NUM_CLOCK_TICKS; ++i) {
@@ -139,14 +147,6 @@ static void handle_init(AppContextRef app_ctx) {
   text_layer_set_font(&s_data.num_label, bold18);
 
   layer_add_child(&s_data.date_layer, &s_data.num_label.layer);
-  
-  // ribbon
-  graphics_context_set_stroke_color(ctx, GColorClear);
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  gpath_draw_filled(ctx, &s_data.ribbon_left_path);
-  gpath_draw_filled(ctx, &s_data.ribbon_right_path);
-  gpath_draw_outline(ctx, &s_data.ribbon_left_path);
-  gpath_draw_outline(ctx, &s_data.ribbon_right_path);
 
   // init hands
   layer_init(&s_data.hands_layer, s_data.simple_bg_layer.frame);
