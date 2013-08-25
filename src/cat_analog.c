@@ -1,4 +1,4 @@
-#include "simple_analog.h"
+#include "cat_analog.h"
 
 #include "pebble_os.h"
 #include "pebble_app.h"
