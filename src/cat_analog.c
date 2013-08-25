@@ -11,7 +11,7 @@
 
 #define MY_UUID {0x24, 0xF8, 0xD9, 0xD9, 0xE8, 0x05, 0x44, 0x30, 0x85, 0xC8, 0x81, 0x15, 0x3C, 0xEB, 0x14, 0xB9}
 PBL_APP_INFO(MY_UUID,
-             "GutGut Analog",
+             "Cat Analog",
              "Weber Chu",
              1, 0,
              DEFAULT_MENU_ICON,
@@ -30,14 +30,8 @@ static struct SimpleAnalogData {
   //GPath tick_paths[NUM_CLOCK_TICKS];
   Layer hands_layer;
   Window window;
-  GPath gut_gut_path;
+  GPath cat_path;
 } s_data;
-
-Layer gut_gut_layer;
-static const GPathInfo GUT_GUT_PATH_INFO = {
-  .num_points = 24,
-  .points = (GPoint []) {{10, -73}, {12, -73}, {13, -70}, {14, -70}, {17, -67}, {7, -65}, {14, -62}, {14, -61}, {20, -57}, {20, -56}, {8, -57}, {-7, -56}, {-17, -52}, {-17, -54}, {-12, -60}, {-12, -61}, {-21, -65}, {-21, -67}, {-10, -64}, {-3, -64}, {7, -66}, {9, -70}, {10, -70}}
-};
 
 static void bg_update_proc(Layer* me, GContext* ctx) {
 
@@ -71,11 +65,11 @@ static void hands_update_proc(Layer* me, GContext* ctx) {
   gpath_draw_filled(ctx, &s_data.hour_arrow);
   gpath_draw_outline(ctx, &s_data.hour_arrow);
   
-  gpath_rotate_to(&s_data.gut_gut_path, TRIG_MAX_ANGLE * t.tm_sec / 60);
+  gpath_rotate_to(&s_data.cat_path, TRIG_MAX_ANGLE * t.tm_sec / 60);
   graphics_context_set_stroke_color(ctx, GColorClear);
   graphics_context_set_fill_color(ctx, GColorBlack);
-  gpath_draw_filled(ctx, &s_data.gut_gut_path);
-  gpath_draw_outline(ctx, &s_data.gut_gut_path);
+  gpath_draw_filled(ctx, &s_data.cat_path);
+  gpath_draw_outline(ctx, &s_data.cat_path);
 
   // dot in the middle
   graphics_context_set_fill_color(ctx, GColorWhite);
@@ -101,12 +95,12 @@ static void handle_init(AppContextRef app_ctx) {
   s_data.num_buffer[0] = '\0';
 
   // init hand paths
-  gpath_init(&s_data.gut_gut_path, &GUT_GUT_PATH_INFO);
+  gpath_init(&s_data.cat_path, &CAT_PATH_INFO);
   gpath_init(&s_data.minute_arrow, &MINUTE_HAND_POINTS);
   gpath_init(&s_data.hour_arrow, &HOUR_HAND_POINTS);
 
   const GPoint center = grect_center_point(&s_data.window.layer.bounds);
-  gpath_move_to(&s_data.gut_gut_path, center);
+  gpath_move_to(&s_data.cat_path, center);
   gpath_move_to(&s_data.minute_arrow, center);
   gpath_move_to(&s_data.hour_arrow, center);
 
