@@ -1,4 +1,4 @@
-#include "cat_analog.h"
+#include "simple_analog.h"
 
 #include "pebble_os.h"
 #include "pebble_app.h"
@@ -26,29 +26,14 @@ static struct SimpleAnalogData {
   TextLayer num_label;
   char num_buffer[4];
 
-  GPath minute_arrow, hour_arrow, cat_path, ribbon_left_path, ribbon_right_path;
-  //GPath tick_paths[NUM_CLOCK_TICKS];
+  GPath minute_arrow, hour_arrow, cat_path;
   Layer hands_layer;
   Window window;
 } s_data;
 
 static void bg_update_proc(Layer* me, GContext* ctx) {
-
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(ctx, me->bounds, 0, GCornerNone);
-  
-  // ribbon
-  graphics_context_set_stroke_color(ctx, GColorClear);
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  gpath_draw_filled(ctx, &s_data.ribbon_left_path);
-  gpath_draw_filled(ctx, &s_data.ribbon_right_path);
-  gpath_draw_outline(ctx, &s_data.ribbon_left_path);
-  gpath_draw_outline(ctx, &s_data.ribbon_right_path);
-
-/*  graphics_context_set_fill_color(ctx, GColorWhite);
-  for (int i = 0; i < NUM_CLOCK_TICKS; ++i) {
-    gpath_draw_filled(ctx, &s_data.tick_paths[i]);
-  }*/
 }
 
 static void hands_update_proc(Layer* me, GContext* ctx) {
@@ -100,22 +85,13 @@ static void handle_init(AppContextRef app_ctx) {
 
   // init hand paths
   gpath_init(&s_data.cat_path, &CAT_PATH_INFO);
-  gpath_init(&s_data.ribbon_left_path, &CAT_PATH_INFO);
-  gpath_init(&s_data.ribbon_right_path, &CAT_PATH_INFO);
   gpath_init(&s_data.minute_arrow, &MINUTE_HAND_POINTS);
   gpath_init(&s_data.hour_arrow, &HOUR_HAND_POINTS);
 
   const GPoint center = grect_center_point(&s_data.window.layer.bounds);
   gpath_move_to(&s_data.cat_path, center);
-  gpath_move_to(&s_data.ribbon_left_path, center);
-  gpath_move_to(&s_data.ribbon_right_path, center);
   gpath_move_to(&s_data.minute_arrow, center);
   gpath_move_to(&s_data.hour_arrow, center);
-
-  // init clock face paths
-/*  for (int i = 0; i < NUM_CLOCK_TICKS; ++i) {
-    gpath_init(&s_data.tick_paths[i], &ANALOG_BG_POINTS[i]);
-  }*/
 
   // init layers
   layer_init(&s_data.simple_bg_layer, s_data.window.layer.frame);
@@ -152,7 +128,7 @@ static void handle_init(AppContextRef app_ctx) {
   layer_init(&s_data.hands_layer, s_data.simple_bg_layer.frame);
   s_data.hands_layer.update_proc = &hands_update_proc;
   layer_add_child(&s_data.window.layer, &s_data.hands_layer);
-	
+
   // Push the window onto the stack
   const bool animated = true;
   window_stack_push(&s_data.window, animated);
