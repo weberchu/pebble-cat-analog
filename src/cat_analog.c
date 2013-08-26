@@ -14,7 +14,7 @@ PBL_APP_INFO(MY_UUID,
              "Cat Analog",
              "Weber Chu",
              1, 0,
-             DEFAULT_MENU_ICON,
+             RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
 
 static struct SimpleAnalogData {

@@ -1,9 +1,9 @@
 {
     "media": [
         {
-            "defName": "IMAGE_GUT_GUT",
-            "type": "png-trans",
-            "file": "images/gutgut_jump.png"
+            "defName": "IMAGE_MENU_ICON",
+            "type": "png",
+            "file": "images/cat_jump.png"
         }
     ],
     "friendlyVersion": "VERSION",
