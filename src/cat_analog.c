@@ -1,150 +1,177 @@
 #include "cat_analog.h"
 
-#include "pebble_os.h"
-#include "pebble_app.h"
-#include "pebble_fonts.h"
+#include "pebble.h"
 
 #include "resource_ids.auto.h"
 
 #include "string.h"
 #include "stdlib.h"
 
-#define MY_UUID {0x24, 0xF8, 0xD9, 0xD9, 0xE8, 0x05, 0x44, 0x30, 0x85, 0xC8, 0x81, 0x15, 0x3C, 0xEB, 0x14, 0xB9}
-PBL_APP_INFO(MY_UUID,
-             "Cat Analog",
-             "Weber Chu",
-             1, 0,
-             RESOURCE_ID_IMAGE_MENU_ICON,
-             APP_INFO_WATCH_FACE);
+Layer *simple_bg_layer;
 
-static struct SimpleAnalogData {
-  Layer simple_bg_layer;
+Layer *date_layer;
+TextLayer *day_label;
+char day_buffer[6];
+TextLayer *num_label;
+char num_buffer[4];
 
-  Layer date_layer;
-  TextLayer day_label;
-  char day_buffer[6];
-  TextLayer num_label;
-  char num_buffer[4];
+GPath *minute_arrow, *hour_arrow, *cat_path;
+Layer *hands_layer;
+Window *window;
 
-  GPath minute_arrow, hour_arrow, cat_path;
-  Layer hands_layer;
-  Window window;
-} s_data;
-
-static void bg_update_proc(Layer* me, GContext* ctx) {
+static void bg_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_fill_rect(ctx, me->bounds, 0, GCornerNone);
+  graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
+
+//  graphics_context_set_fill_color(ctx, GColorWhite);
+//  for (int i = 0; i < NUM_CLOCK_TICKS; ++i) {
+//    gpath_draw_filled(ctx, tick_paths[i]);
+//  }
 }
 
-static void hands_update_proc(Layer* me, GContext* ctx) {
-  const GPoint center = grect_center_point(&me->bounds);
+static void hands_update_proc(Layer *layer, GContext *ctx) {
+  GRect bounds = layer_get_bounds(layer);
 
-  PblTm t;
-  get_time(&t);
+  time_t now = time(NULL);
+  struct tm *t = localtime(&now);
 
   // minute/hour hand
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_context_set_stroke_color(ctx, GColorBlack);
 
-  gpath_rotate_to(&s_data.minute_arrow, TRIG_MAX_ANGLE * t.tm_min / 60);
-  gpath_draw_filled(ctx, &s_data.minute_arrow);
-  gpath_draw_outline(ctx, &s_data.minute_arrow);
+  gpath_rotate_to(minute_arrow, TRIG_MAX_ANGLE * t->tm_min / 60);
+  gpath_draw_filled(ctx, minute_arrow);
+  gpath_draw_outline(ctx, minute_arrow);
 
-  gpath_rotate_to(&s_data.hour_arrow, (TRIG_MAX_ANGLE * (((t.tm_hour % 12) * 6) + (t.tm_min / 10))) / (12 * 6));
-  gpath_draw_filled(ctx, &s_data.hour_arrow);
-  gpath_draw_outline(ctx, &s_data.hour_arrow);
+  gpath_rotate_to(hour_arrow, (TRIG_MAX_ANGLE * (((t->tm_hour % 12) * 6) + (t->tm_min / 10))) / (12 * 6));
+  gpath_draw_filled(ctx, hour_arrow);
+  gpath_draw_outline(ctx, hour_arrow);
   
-  gpath_rotate_to(&s_data.cat_path, TRIG_MAX_ANGLE * t.tm_sec / 60);
+  // cat second hand
+  gpath_rotate_to(cat_path, TRIG_MAX_ANGLE * t->tm_sec / 60);
   graphics_context_set_stroke_color(ctx, GColorClear);
   graphics_context_set_fill_color(ctx, GColorBlack);
-  gpath_draw_filled(ctx, &s_data.cat_path);
-  gpath_draw_outline(ctx, &s_data.cat_path);
+  gpath_draw_filled(ctx, cat_path);
+  gpath_draw_outline(ctx, cat_path);
 
   // dot in the middle
   graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_fill_rect(ctx, GRect(me->bounds.size.w / 2-1, me->bounds.size.h / 2-1, 3, 3), 0, GCornerNone);
+  graphics_fill_rect(ctx, GRect(bounds.size.w / 2-1, bounds.size.h / 2-1, 3, 3), 0, GCornerNone);
 }
 
-static void date_update_proc(Layer* me, GContext* ctx) {
+static void date_update_proc(Layer *layer, GContext *ctx) {
 
-  PblTm t;
-  get_time(&t);
+  time_t now = time(NULL);
+  struct tm *t = localtime(&now);
 
-  string_format_time(s_data.day_buffer, sizeof(s_data.day_buffer), "%a", &t);
-  text_layer_set_text(&s_data.day_label, s_data.day_buffer);
+  strftime(day_buffer, sizeof(day_buffer), "%a", t);
+  text_layer_set_text(day_label, day_buffer);
 
-  string_format_time(s_data.num_buffer, sizeof(s_data.num_buffer), "%d", &t);
-  text_layer_set_text(&s_data.num_label, s_data.num_buffer);
+  strftime(num_buffer, sizeof(num_buffer), "%d", t);
+  text_layer_set_text(num_label, num_buffer);
 }
 
-static void handle_init(AppContextRef app_ctx) {
-  window_init(&s_data.window, "Simple Analog Watch");
+static void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
+  layer_mark_dirty(window_get_root_layer(window));
+}
 
-  s_data.day_buffer[0] = '\0';
-  s_data.num_buffer[0] = '\0';
-
-  // init hand paths
-  gpath_init(&s_data.cat_path, &CAT_PATH_INFO);
-  gpath_init(&s_data.minute_arrow, &MINUTE_HAND_POINTS);
-  gpath_init(&s_data.hour_arrow, &HOUR_HAND_POINTS);
-
-  const GPoint center = grect_center_point(&s_data.window.layer.bounds);
-  gpath_move_to(&s_data.cat_path, center);
-  gpath_move_to(&s_data.minute_arrow, center);
-  gpath_move_to(&s_data.hour_arrow, center);
+static void window_load(Window *window) {
+  Layer *window_layer = window_get_root_layer(window);
+  GRect bounds = layer_get_bounds(window_layer);
 
   // init layers
-  layer_init(&s_data.simple_bg_layer, s_data.window.layer.frame);
-  s_data.simple_bg_layer.update_proc = &bg_update_proc;
-  layer_add_child(&s_data.window.layer, &s_data.simple_bg_layer);
+  simple_bg_layer = layer_create(bounds);
+  layer_set_update_proc(simple_bg_layer, bg_update_proc);
+  layer_add_child(window_layer, simple_bg_layer);
 
   // init date layer -> a plain parent layer to create a date update proc
-  layer_init(&s_data.date_layer, s_data.window.layer.frame);
-  s_data.date_layer.update_proc = &date_update_proc;
-  layer_add_child(&s_data.window.layer, &s_data.date_layer);
+  date_layer = layer_create(bounds);
+  layer_set_update_proc(date_layer, date_update_proc);
+  layer_add_child(window_layer, date_layer);
 
   // init day
-  text_layer_init(&s_data.day_label, GRect(46, 114, 27, 20));
-  text_layer_set_text(&s_data.day_label, s_data.day_buffer);
-  text_layer_set_background_color(&s_data.day_label, GColorWhite);
-  text_layer_set_text_color(&s_data.day_label, GColorBlack);
+  day_label = text_layer_create(GRect(46, 114, 27, 20));
+  text_layer_set_text(day_label, day_buffer);
+  text_layer_set_background_color(day_label, GColorWhite);
+  text_layer_set_text_color(day_label, GColorBlack);
   GFont norm18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
-  text_layer_set_font(&s_data.day_label, norm18);
+  text_layer_set_font(day_label, norm18);
 
-  layer_add_child(&s_data.date_layer, &s_data.day_label.layer);
+  layer_add_child(date_layer, text_layer_get_layer(day_label));
 
   // init num
-  text_layer_init(&s_data.num_label, GRect(73, 114, 18, 20));
+  num_label = text_layer_create(GRect(73, 114, 18, 20));
 
-  text_layer_set_text(&s_data.num_label, s_data.num_buffer);
-  text_layer_set_background_color(&s_data.num_label, GColorWhite);
-  text_layer_set_text_color(&s_data.num_label, GColorBlack);
+  text_layer_set_text(num_label, num_buffer);
+  text_layer_set_background_color(num_label, GColorWhite);
+  text_layer_set_text_color(num_label, GColorBlack);
   GFont bold18 = fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD);
-  text_layer_set_font(&s_data.num_label, bold18);
+  text_layer_set_font(num_label, bold18);
 
-  layer_add_child(&s_data.date_layer, &s_data.num_label.layer);
+  layer_add_child(date_layer, text_layer_get_layer(num_label));
 
   // init hands
-  layer_init(&s_data.hands_layer, s_data.simple_bg_layer.frame);
-  s_data.hands_layer.update_proc = &hands_update_proc;
-  layer_add_child(&s_data.window.layer, &s_data.hands_layer);
+  hands_layer = layer_create(bounds);
+  layer_set_update_proc(hands_layer, hands_update_proc);
+  layer_add_child(window_layer, hands_layer);
+}
+
+static void window_unload(Window *window) {
+  layer_destroy(simple_bg_layer);
+  layer_destroy(date_layer);
+  text_layer_destroy(day_label);
+  text_layer_destroy(num_label);
+  layer_destroy(hands_layer);
+}
+
+static void init(void) {
+  window = window_create();
+  window_set_window_handlers(window, (WindowHandlers) {
+    .load = window_load,
+    .unload = window_unload,
+  });
+
+  day_buffer[0] = '\0';
+  num_buffer[0] = '\0';
+
+  cat_path = gpath_create(&CAT_PATH_INFO);
+  minute_arrow = gpath_create(&MINUTE_HAND_POINTS);
+  hour_arrow = gpath_create(&HOUR_HAND_POINTS);
+
+  Layer *window_layer = window_get_root_layer(window);
+  GRect bounds = layer_get_bounds(window_layer);
+  const GPoint center = grect_center_point(&bounds);
+  gpath_move_to(cat_path, center);
+  gpath_move_to(minute_arrow, center);
+  gpath_move_to(hour_arrow, center);
+
+  // init clock face paths
+//  for (int i = 0; i < NUM_CLOCK_TICKS; ++i) {
+//    tick_paths[i] = gpath_create(&ANALOG_BG_POINTS[i]);
+//  }
 
   // Push the window onto the stack
   const bool animated = true;
-  window_stack_push(&s_data.window, animated);
+  window_stack_push(window, animated);
+
+  tick_timer_service_subscribe(SECOND_UNIT, handle_second_tick);
 }
 
-static void handle_second_tick(AppContextRef ctx, PebbleTickEvent* t) {
-  layer_mark_dirty(&s_data.window.layer);
+static void deinit(void) {
+  gpath_destroy(minute_arrow);
+  gpath_destroy(hour_arrow);
+  gpath_destroy(cat_path);
+
+//  for (int i = 0; i < NUM_CLOCK_TICKS; ++i) {
+//    gpath_destroy(tick_paths[i]);
+//  }
+
+  tick_timer_service_unsubscribe();
+  window_destroy(window);
 }
 
-void pbl_main(void* params) {
-  PebbleAppHandlers handlers = {
-    .init_handler = &handle_init,
-    .tick_info = {
-      .tick_handler = &handle_second_tick,
-      .tick_units = SECOND_UNIT
-    }
-  };
-  app_event_loop(params, &handlers);
+int main(void) {
+  init();
+  app_event_loop();
+  deinit();
 }

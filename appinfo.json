@@ -1,0 +1,25 @@
+{
+    "versionLabel": "1.1",
+    "uuid": "2d96377e-0eb4-4092-aa2f-59698e509752",
+    "appKeys": {},
+    "longName": "Cat Analog",
+    "versionCode": 2,
+    "capabilities": [
+        ""
+    ],
+    "shortName": "Cat Analog",
+    "companyName": "weberchu",
+    "watchapp": {
+        "watchface": true
+    },
+    "resources": {
+        "media": [
+            {
+                "menuIcon": true,
+                "type": "png",
+                "name": "IMAGE_MENU_ICON",
+                "file": "images/cat_jump.png"
+            }
+        ]
+    }
+}

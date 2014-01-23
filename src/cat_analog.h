@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pebble_os.h"
+#include "pebble.h"
 
 static const GPathInfo CAT_PATH_INFO = {
   23,
